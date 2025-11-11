@@ -93,3 +93,39 @@ af.cmd
 
 # playwright
 storageState.json
+# Docker runtime data
+postgres/
+storage/
+config/
+
+# Docker specific
+docker-compose.override.yml
+docker-data/
+*.pid
+*.log
+
+# Environment files
+.env
+.env.*
+!*.template.env  # if you plan to keep a template example
+
+# Affine generated files
+/root/.affine/
+affine.db
+affine_server/
+affine_migration_job/
+affine_postgres/
+affine_redis/
+
+# Container cache
+**/__pycache__/
+**/.pytest_cache/
+**/.cache/
+**/.docker/
+
+# Optional: local development artifacts
+*.bak
+*.tmp
+*.swp
+*.log
+logs/
