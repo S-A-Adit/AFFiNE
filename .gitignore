@@ -127,6 +127,3 @@ affine_redis/
 *.swp
 *.log
 logs/
-.aider*
-.env
-.env
