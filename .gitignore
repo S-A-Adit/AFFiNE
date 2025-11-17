@@ -129,4 +129,3 @@ affine_redis/
 logs/
 .aider*
 .env
-.env
