@@ -1,31 +1,37 @@
+// Define the BatteryManager interface for TypeScript
+interface BatteryManager extends EventTarget {
+  readonly charging: boolean;
+  readonly level: number;
+}
+
 // Internal flags for managing high-power features *requests*
-let _manualOverrideLow = false;
-let _thermalTriggeredLow = false;
-let _batteryTriggeredLow = false;
+let _manualOverrideLow: boolean = false;
+let _thermalTriggeredLow: boolean = false;
+let _batteryTriggeredLow: boolean = false;
 
 // Internal flags for managing high-power features *actual state*
 // These will be derived from the above request flags
-let _liveRendering = true;
-let _expensiveAnimations = true;
-let _renderQuality = 'high'; // 'high', 'low'
+let _liveRendering: boolean = true;
+let _expensiveAnimations: boolean = true;
+let _renderQuality: 'high' | 'low' = 'high';
 
 // Internal state for battery monitoring
-let _batteryManager = null; // Store battery manager instance
+let _batteryManager: BatteryManager | null = null; // Store battery manager instance
 
-const _applySettings = (source = 'unknown') => {
+const _applySettings = (source: string = 'unknown'): void => {
   const isHighPower = !(_manualOverrideLow || _thermalTriggeredLow || _batteryTriggeredLow);
 
   _liveRendering = isHighPower;
   _expensiveAnimations = isHighPower; // Apply to expensiveAnimations as well
   _renderQuality = isHighPower ? 'high' : 'low';
 
-  if (typeof globalThis.APP_SETTINGS === 'object' && globalThis.APP_SETTINGS !== null) {
-    globalThis.APP_SETTINGS.liveRendering = _liveRendering;
+  if (typeof (globalThis as any).APP_SETTINGS === 'object' && (globalThis as any).APP_SETTINGS !== null) {
+    (globalThis as any).APP_SETTINGS.liveRendering = _liveRendering;
     // Assuming APP_SETTINGS can also manage other rendering aspects.
     // This is a placeholder for actual integration with a render quality setting.
-    globalThis.APP_SETTINGS.renderQuality = _renderQuality;
+    (globalThis as any).APP_SETTINGS.renderQuality = _renderQuality;
     // If APP_SETTINGS also has expensiveAnimations, it would be set here.
-    // globalThis.APP_SETTINGS.expensiveAnimations = _expensiveAnimations;
+    // (globalThis as any).APP_SETTINGS.expensiveAnimations = _expensiveAnimations;
   }
   // For flags not directly in globalThis.APP_SETTINGS, they would be used internally
   // by modules consuming these settings (e.g., an animation module checking _expensiveAnimations).
@@ -41,7 +47,7 @@ _applySettings('initialization');
  * Disables high-power features to reduce system load.
  * This is a manual override and takes precedence over environmental factors.
  */
-export const disableHighPowerFeatures = () => {
+export const disableHighPowerFeatures = (): void => {
   _manualOverrideLow = true;
   _thermalTriggeredLow = false; // Manual override clears environmental triggers
   _batteryTriggeredLow = false; // Manual override clears environmental triggers
@@ -54,7 +60,7 @@ export const disableHighPowerFeatures = () => {
  * This clears any manual override and allows environmental factors (thermal, battery)
  * to potentially reduce load again if their conditions are met.
  */
-export const enableHighPowerFeatures = () => {
+export const enableHighPowerFeatures = (): void => {
   _manualOverrideLow = false;
   // Clear all environmental triggers when manually enabling high-power features
   _thermalTriggeredLow = false;
@@ -67,7 +73,9 @@ export const enableHighPowerFeatures = () => {
  * Reduces load based on the thermal state of the device.
  * @param {('nominal'|'fair'|'serious'|'critical')} state - The current thermal state.
  */
-export const reduceLoadForThermalState = (state) => {
+export const reduceLoadForThermalState = (
+  state: 'nominal' | 'fair' | 'serious' | 'critical'
+): void => {
   if (_manualOverrideLow) {
     console.log(`Thermal state '${state}' detected, but manual override is active. No changes from thermal state.`);
     return;
@@ -87,7 +95,7 @@ export const reduceLoadForThermalState = (state) => {
   }
 };
 
-const _handleBatteryChange = () => {
+const _handleBatteryChange = (): void => {
   if (!_batteryManager) {
     return;
   }
@@ -116,9 +124,9 @@ const _handleBatteryChange = () => {
  * Initializes power management by setting up battery status monitoring.
  * This function should be called once when the application starts.
  */
-export const initPowerManagement = () => {
+export const initPowerManagement = (): void => {
   if (typeof navigator !== 'undefined' && 'getBattery' in navigator) {
-    navigator.getBattery().then(battery => {
+    (navigator as any).getBattery().then((battery: BatteryManager) => {
       _batteryManager = battery;
       _batteryManager.addEventListener('chargingchange', _handleBatteryChange);
       _batteryManager.addEventListener('levelchange', _handleBatteryChange);
@@ -126,7 +134,7 @@ export const initPowerManagement = () => {
       // Set initial state
       _handleBatteryChange();
       console.log('Battery monitoring initialized.');
-    }).catch(err => {
+    }).catch((err: any) => {
       console.error('Failed to initialize battery monitoring:', err);
     });
   } else {
