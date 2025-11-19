@@ -97,16 +97,17 @@ const _handleBatteryChange = () => {
     return;
   }
 
-  const shouldBeLow = !_batteryManager.charging; // If not charging, should be low power
+  // Low power if not charging, or if battery is low (e.g., <= 20%)
+  const shouldBeLow = !_batteryManager.charging || _batteryManager.level <= 0.2;
   const changed = _batteryTriggeredLow !== shouldBeLow;
 
   if (changed) {
     _batteryTriggeredLow = shouldBeLow;
     _applySettings('battery');
     if (shouldBeLow) {
-      console.warn(`Battery state: Discharging. Reducing load to save battery.`);
+      console.warn(`Battery state: Discharging or level is low. Reducing load to save battery.`);
     } else {
-      console.log(`Battery state: Charging. Reverting battery load reduction.`);
+      console.log(`Battery state: Charging and level is sufficient. Reverting battery load reduction.`);
     }
   }
 };
@@ -120,7 +121,7 @@ export const initPowerManagement = () => {
     navigator.getBattery().then(battery => {
       _batteryManager = battery;
       _batteryManager.addEventListener('chargingchange', _handleBatteryChange);
-      // _batteryManager.addEventListener('levelchange', _handleBatteryChange); // Less critical for enabling/disabling features
+      _batteryManager.addEventListener('levelchange', _handleBatteryChange);
 
       // Set initial state
       _handleBatteryChange();
