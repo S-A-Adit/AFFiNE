@@ -249,6 +249,7 @@ class FootnoteParser {
  * [^ref]: {"type":"url","url":"https://example.com"}
  */
 export function footnoteUrlPreprocessor(content: string): string {
+  console.log('Running footnoteUrlPreprocessor on:', content);
   const parser = new FootnoteParser();
   return parser.process(content);
 }
