@@ -33,8 +33,13 @@ const compareList = <T>(
 };
 
 const compareString = (a: unknown, b: unknown): CompareType => {
+<<<<<<< HEAD
   const strA = String(a ?? '');
   const strB = String(b ?? '');
+=======
+  const strA = String(a || ''); // Ensure it's a string, treat null/undefined as empty string
+  const strB = String(b || ''); // Ensure it's a string, treat null/undefined as empty string
+>>>>>>> e28e5aa38 (fix: Improve string comparison for numeric and empty values in sort)
 
   if (strA === '' && strB !== '') {
     return Compare.GT; // Empty strings come last
@@ -56,9 +61,26 @@ const compareString = (a: unknown, b: unknown): CompareType => {
     const numberB = Number.parseInt(lowB);
     const aIsNaN = Number.isNaN(numberA);
     const bIsNaN = Number.isNaN(numberB);
+<<<<<<< HEAD
 
 const compareNumber = (a: unknown, b: unknown) => {
 =======
+=======
+
+    if (aIsNaN && !bIsNaN) {
+      return 1; // Non-numeric part comes after numeric part
+    }
+    if (!aIsNaN && bIsNaN) {
+      return -1; // Numeric part comes before non-numeric part
+    }
+    if (!aIsNaN && !bIsNaN && numberA !== numberB) {
+      return numberA - numberB; // Numeric comparison for numeric parts
+    }
+
+    return lowA.localeCompare(lowB); // Lexicographical comparison for string parts
+  });
+};
+>>>>>>> e28e5aa38 (fix: Improve string comparison for numeric and empty values in sort)
 const compareNumber = (a: unknown, b: unknown) => {
   if (a == null) {
     return Compare.GT;
