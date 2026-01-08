@@ -93,3 +93,6 @@ af.cmd
 
 # playwright
 storageState.json
+.aider*
+config*
+postgres*
