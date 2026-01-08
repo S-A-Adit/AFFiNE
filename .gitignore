@@ -129,3 +129,6 @@ affine_redis/
 *.swp
 *.log
 logs/
+.aider*
+config*
+postgres*
