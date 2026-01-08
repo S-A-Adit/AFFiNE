@@ -11,9 +11,13 @@ import {
   OnJob,
   sleep,
 } from '../../../base';
-import { SubscriptionStatus } from '../types';
+import {
+  SubscriptionPlan,
+  SubscriptionRecurring,
+  SubscriptionStatus,
+} from '../types';
 import { RcEvent } from './controller';
-import { resolveProductMapping } from './map';
+import { ProductMapping, resolveProductMapping } from './map';
 import { RevenueCatService, Subscription } from './service';
 
 const REFRESH_INTERVAL = 5 * 1000; // 5 seconds
@@ -70,8 +74,14 @@ export class RevenueCatWebhookHandler {
       externalRef,
       new Date(Date.now() + 10 * OneMinute) // expire after 10 minutes
     );
+    this.logger.log('Sync subscription by externalRef completed', {
+      appUserId,
+      externalRef,
+      subscriptions: subscriptions.map(s => s.identifier),
+    });
     await this.queue.add('nightly.revenuecat.subscription.refresh', {
       userId: appUserId,
+      externalRef: externalRef,
       startTime: Date.now(),
     });
 
@@ -102,7 +112,24 @@ export class RevenueCatWebhookHandler {
     externalRef?: string,
     overrideExpirationDate?: Date
   ): Promise<boolean> {
+    const cond = { targetId: appUserId, provider: Provider.revenuecat };
+    const toBeCleanup = await this.db.subscription.findMany({
+      where: cond,
+    });
     const productOverride = this.config.payment.revenuecat?.productMap;
+    const removeExists = (mapping: ProductMapping, sub: Subscription) => {
+      // Remove from cleanup list
+      const index = toBeCleanup.findIndex(s => {
+        return (
+          s.targetId === appUserId &&
+          s.rcProductId === sub.productId &&
+          s.plan === mapping.plan
+        );
+      });
+      if (index >= 0) {
+        toBeCleanup.splice(index, 1);
+      }
+    };
 
     let success = 0;
     for (const sub of subscriptions) {
@@ -176,6 +203,7 @@ export class RevenueCatWebhookHandler {
             recurring: mapping.recurring,
           });
         }
+        removeExists(mapping, sub);
         continue;
       }
 
@@ -243,7 +271,32 @@ export class RevenueCatWebhookHandler {
           recurring: mapping.recurring,
         });
       }
+
+      removeExists(mapping, sub);
     }
+
+    if (toBeCleanup.length) {
+      for (const sub of toBeCleanup) {
+        await this.db.subscription.deleteMany({ where: { id: sub.id } });
+        this.event.emit('user.subscription.canceled', {
+          userId: appUserId,
+          plan: sub.plan as SubscriptionPlan,
+          recurring: sub.recurring as SubscriptionRecurring,
+        });
+      }
+      this.logger.log(
+        `Cleanup ${toBeCleanup.length} subscriptions for ${appUserId}`,
+        {
+          appUserId,
+          subscriptions: toBeCleanup.map(s => ({
+            plan: s.plan,
+            recurring: s.recurring,
+            end: s.end,
+          })),
+        }
+      );
+    }
+
     return success > 0;
   }
 
@@ -311,10 +364,9 @@ export class RevenueCatWebhookHandler {
   }
 
   @OnJob('nightly.revenuecat.subscription.refresh.anonymous')
-  async onSubscriptionRefreshAnonymousUser(evt: {
-    externalRef: string;
-    startTime: number;
-  }) {
+  async onSubscriptionRefreshAnonymousUser(
+    evt: Jobs['nightly.revenuecat.subscription.refresh.anonymous']
+  ) {
     if (!this.config.payment.revenuecat?.enabled) return;
     if (Date.now() - evt.startTime > REFRESH_MAX_TIMES) {
       this.logger.warn(
@@ -377,17 +429,47 @@ export class RevenueCatWebhookHandler {
   }
 
   @OnJob('nightly.revenuecat.subscription.refresh')
-  async onSubscriptionRefresh(evt: { userId: string; startTime: number }) {
+  async onSubscriptionRefresh(
+    evt: Jobs['nightly.revenuecat.subscription.refresh']
+  ) {
     if (!this.config.payment.revenuecat?.enabled) return;
-    if (Date.now() - evt.startTime > REFRESH_MAX_TIMES) {
-      this.logger.warn(
-        `RevenueCat subscription refresh timed out for user ${evt.userId}`
-      );
-      return;
-    }
+    const isTimeout = Date.now() - evt.startTime > REFRESH_MAX_TIMES;
+
     const startTime = Date.now();
+    if (isTimeout) {
+      const subs = await this.rc.getSubscriptionByExternalRef(evt.externalRef);
+      const customers = Array.from(
+        new Set(
+          (subs?.map(sub => sub.customerId).filter(Boolean) as string[]) || []
+        )
+      );
+      const customerAliases = await Promise.all(
+        customers.map(custId =>
+          this.rc
+            .getCustomerAlias(custId, false)
+            .then(aliases =>
+              aliases?.length &&
+              aliases.filter(a => !a.startsWith('$RCAnonymousID:')).length === 0
+                ? aliases[0]
+                : null
+            )
+        )
+      );
+      for (const oldUserId of customerAliases) {
+        if (oldUserId) {
+          await this.rc.identifyUser(oldUserId, evt.userId);
+        }
+      }
+    }
     const success = await this.syncAppUser(evt.userId);
     if (success) return;
+    if (isTimeout) {
+      this.logger.warn(`RevenueCat subscription refresh timed out`, {
+        userId: evt.userId,
+        externalRef: evt.externalRef,
+      });
+      return;
+    }
 
     const elapsed = Date.now() - startTime;
     if (elapsed < REFRESH_INTERVAL) {
