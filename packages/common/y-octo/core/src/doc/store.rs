@@ -11,7 +11,10 @@ use crate::{
 };
 
 pub type ChangedTypeRefs = HashMap<YTypeRef, Vec<SmolStr>>;
+<<<<<<< HEAD
 type PendingTypes = HashMap<Id, YTypeRef>;
+=======
+>>>>>>> 036153a0b (feat(native): sync yocto codes (#14243))
 
 unsafe impl Send for DocStore {}
 unsafe impl Sync for DocStore {}

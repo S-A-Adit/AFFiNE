@@ -6,11 +6,16 @@ use std::{
 
 use y_octo::{AHashMap, Any, Map, Text, TextAttributes, TextDeltaOp, TextInsert, Value};
 
+<<<<<<< HEAD:packages/common/native/src/doc_parser/markdown/delta.rs
 use super::{
   super::value::{
     any_as_string, any_as_u64, any_truthy, build_reference_payload, params_any_map_to_json, value_to_any,
   },
   inline::InlineStyle,
+=======
+use super::value::{
+  any_as_string, any_as_u64, any_truthy, build_reference_payload, params_any_map_to_json, value_to_any,
+>>>>>>> 036153a0b (feat(native): sync yocto codes (#14243)):packages/common/native/src/doc_parser/delta_markdown.rs
 };
 
 #[derive(Debug, Clone)]
@@ -57,7 +62,18 @@ impl DeltaToMdOptions {
   }
 }
 
+<<<<<<< HEAD:packages/common/native/src/doc_parser/markdown/delta.rs
 pub(crate) fn text_to_inline_markdown(block: &Map, key: &str, options: &DeltaToMdOptions) -> Option<String> {
+=======
+pub(super) fn text_to_markdown(block: &Map, key: &str, options: &DeltaToMdOptions) -> Option<String> {
+  block
+    .get(key)
+    .and_then(|value| value.to_text())
+    .map(|text| delta_to_markdown(&text, options))
+}
+
+pub(super) fn text_to_inline_markdown(block: &Map, key: &str, options: &DeltaToMdOptions) -> Option<String> {
+>>>>>>> 036153a0b (feat(native): sync yocto codes (#14243)):packages/common/native/src/doc_parser/delta_markdown.rs
   block
     .get(key)
     .and_then(|value| value.to_text())
@@ -288,7 +304,11 @@ fn delta_any_to_inline_markdown(value: &Any, options: &DeltaToMdOptions) -> Opti
   delta_ops_from_any(value).map(|ops| delta_ops_to_markdown_with_options(&ops, options, false))
 }
 
+<<<<<<< HEAD:packages/common/native/src/doc_parser/markdown/delta.rs
 pub(crate) fn delta_value_to_inline_markdown(value: &Value, options: &DeltaToMdOptions) -> Option<String> {
+=======
+pub(super) fn delta_value_to_inline_markdown(value: &Value, options: &DeltaToMdOptions) -> Option<String> {
+>>>>>>> 036153a0b (feat(native): sync yocto codes (#14243)):packages/common/native/src/doc_parser/delta_markdown.rs
   if let Some(text) = value.to_text() {
     return Some(delta_to_inline_markdown(&text, options));
   }
@@ -552,6 +572,7 @@ fn apply_inline_attributes(
 }
 
 fn inline_node_for_attr(attr: &str, attrs: &TextAttributes, options: &DeltaToMdOptions) -> Option<Rc<RefCell<Node>>> {
+<<<<<<< HEAD:packages/common/native/src/doc_parser/markdown/delta.rs
   let style = InlineStyle::from_key(attr)?;
   if let Some(delimiter) = style.delimiter() {
     return Some(Node::new_inline(delimiter.open, delimiter.close));
@@ -575,6 +596,21 @@ fn inline_node_for_attr(attr: &str, attrs: &TextAttributes, options: &DeltaToMdO
       let (title, link) = options.build_reference_link(&reference);
       Node::new_inline("[", &format!("{title}]({link})"))
     }),
+=======
+  match attr {
+    "italic" => Some(Node::new_inline("_", "_")),
+    "bold" => Some(Node::new_inline("**", "**")),
+    "link" => attrs
+      .get(attr)
+      .and_then(any_as_string)
+      .map(|url| Node::new_inline("[", &format!("]({url})"))),
+    "reference" => attrs.get(attr).and_then(parse_inline_reference).map(|reference| {
+      let (title, link) = options.build_reference_link(&reference);
+      Node::new_inline("[", &format!("{title}]({link})"))
+    }),
+    "strike" => Some(Node::new_inline("~~", "~~")),
+    "code" => Some(Node::new_inline("`", "`")),
+>>>>>>> 036153a0b (feat(native): sync yocto codes (#14243)):packages/common/native/src/doc_parser/delta_markdown.rs
     _ => None,
   }
 }
@@ -584,7 +620,11 @@ fn has_block_level_attribute(attrs: &TextAttributes) -> bool {
 }
 
 fn is_inline_attribute(attr: &str) -> bool {
+<<<<<<< HEAD:packages/common/native/src/doc_parser/markdown/delta.rs
   InlineStyle::from_key(attr).is_some()
+=======
+  matches!(attr, "italic" | "bold" | "link" | "reference" | "strike" | "code")
+>>>>>>> 036153a0b (feat(native): sync yocto codes (#14243)):packages/common/native/src/doc_parser/delta_markdown.rs
 }
 
 fn encode_link(link: &str) -> String {

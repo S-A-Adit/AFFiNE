@@ -69,6 +69,14 @@ impl Hash for YTypeRef {
   }
 }
 
+impl Eq for YTypeRef {}
+
+impl Hash for YTypeRef {
+  fn hash<H: Hasher>(&self, state: &mut H) {
+    self.inner.ptr().hash(state);
+  }
+}
+
 impl YType {
   pub fn new(kind: YTypeKind, tag_name: Option<String>) -> Self {
     YType {

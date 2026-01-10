@@ -545,6 +545,7 @@ mod tests {
       assert!(list.len() == 7);
       assert!(matches!(list[6], Value::Array(_)));
     }
+<<<<<<< HEAD
 
     {
       let binary_detached = {
@@ -572,6 +573,8 @@ mod tests {
       };
       assert_eq!(detached_sub_array.get(0).unwrap(), Value::Any(1.0.into()));
     }
+=======
+>>>>>>> 036153a0b (feat(native): sync yocto codes (#14243))
   }
 
   #[test]
