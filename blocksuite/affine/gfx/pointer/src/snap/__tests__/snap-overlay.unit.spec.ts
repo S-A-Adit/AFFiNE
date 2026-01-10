@@ -1,5 +1,5 @@
 import { Point } from '@blocksuite/global/gfx';
-import { SnapOverlay } => '../snap-overlay';
+import { SnapOverlay } from '../snap-overlay';
 import type { GfxController } from '@blocksuite/std/gfx';
 
 describe('SnapOverlay', () => {
