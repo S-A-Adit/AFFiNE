@@ -2,8 +2,8 @@ import type { DeltaInsert } from '@blocksuite/store';
 import { describe, expect, it } from 'vitest';
 
 import type { AffineTextAttributes } from '../../../../types/index.js';
-import type { HtmlAST } from '../../types/hast.js';
-import { NotionHtmlDeltaConverter } from '../delta-converter.js';
+import type { HtmlAST } from '../../adapters/types/hast.js';
+import { NotionHtmlDeltaConverter } from '../../adapters/notion-html/delta-converter.js';
 
 describe('NotionHtmlDeltaConverter', () => {
   let converter: NotionHtmlDeltaConverter;
