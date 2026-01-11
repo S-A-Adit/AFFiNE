@@ -243,7 +243,24 @@ impl Doc {
     let mut store = self.store.write().unwrap();
     let mut retry = false;
 
+
     loop {
+      // clone every time to avoid ref count issue
+      let pending_types = update
+        .structs
+        .values()
+        .flatten()
+        .filter_map(|n| {
+          if let Node::Item(item_ref) = n
+            && let Some(item) = item_ref.get()
+            && let Content::Type(ty) = &item.content
+          {
+            Some((item.id, ty.clone()))
+          } else {
+            None
+          }
+        })
+        .collect();
       // clone every time to avoid ref count issue
       let pending_types = update
         .structs
@@ -264,6 +281,7 @@ impl Doc {
         if let Node::Item(item) = &mut s {
           debug_assert!(item.is_owned());
           let mut item = unsafe { item.get_mut_unchecked() };
+          store.repair(&mut item, self.store.clone(), &pending_types)?;
           store.repair(&mut item, self.store.clone(), &pending_types)?;
         }
         store.integrate(s, offset, None)?;
@@ -545,7 +563,6 @@ mod tests {
       assert!(list.len() == 7);
       assert!(matches!(list[6], Value::Array(_)));
     }
-<<<<<<< HEAD
 
     {
       let binary_detached = {
@@ -573,8 +590,6 @@ mod tests {
       };
       assert_eq!(detached_sub_array.get(0).unwrap(), Value::Any(1.0.into()));
     }
-=======
->>>>>>> 036153a0b (feat(native): sync yocto codes (#14243))
   }
 
   #[test]
@@ -691,12 +706,27 @@ mod tests {
       child.insert("k".to_string(), "v").unwrap();
       root.insert("child".to_string(), child.clone()).unwrap();
 
+      let mut root = doc.get_or_create_map("root").unwrap();
+      let mut child = doc.create_map().unwrap();
+      child.insert("k".to_string(), "v").unwrap();
+      root.insert("child".to_string(), child.clone()).unwrap();
+
       let update = doc.encode_update_v1().unwrap();
 
       let doc = Doc::try_from_binary_v1(update).unwrap();
       let text = doc.get_or_create_text("text").unwrap();
 
       assert_eq!(&text.to_string(), "hello world");
+
+      let root = doc.get_or_create_map("root").unwrap();
+      if let Some(Value::Map(child)) = root.get("child") {
+        assert!(
+          matches!(child.get("k"), Some(Value::Any(Any::String(s))) if s == "v"),
+          "expected nested map value to survive apply_update"
+        );
+      } else {
+        panic!("expected nested map to survive apply_update");
+      }
 
       let root = doc.get_or_create_map("root").unwrap();
       if let Some(Value::Map(child)) = root.get("child") {
