@@ -57,15 +57,9 @@ impl PartialEq for YTypeRef {
   fn eq(&self, other: &Self) -> bool {
     // only check pointer equality
     // currently no scenarios that involve cross document ytype comparisons
+    // only check pointer equality
+    // currently no scenarios that involve cross document ytype comparisons
     self.inner.ptr_eq(&other.inner)
-  }
-}
-
-impl Eq for YTypeRef {}
-
-impl Hash for YTypeRef {
-  fn hash<H: Hasher>(&self, state: &mut H) {
-    self.inner.ptr().hash(state);
   }
 }
 
