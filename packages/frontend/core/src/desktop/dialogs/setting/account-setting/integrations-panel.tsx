@@ -24,9 +24,13 @@ import {
 import { CollapsibleWrapper } from '../layout';
 import * as styles from './integrations-panel.css';
 
+<<<<<<< HEAD
 type CalendarAccount = NonNullable<
   CalendarAccountsQuery['currentUser']
 >['calendarAccounts'][number];
+=======
+type CalendarAccount = CalendarAccountsQuery['calendarAccounts'][number];
+>>>>>>> a9e2dd297 (feat(core): integrate google calendar sync (#14248))
 
 const providerMeta = {
   [CalendarProviderType.Google]: {
@@ -68,8 +72,13 @@ export const IntegrationsPanel = () => {
             context: { signal },
           }),
         ]);
+<<<<<<< HEAD
         setAccounts(accountsData.currentUser?.calendarAccounts ?? []);
         setProviders(providersData.serverConfig.calendarProviders ?? []);
+=======
+        setAccounts(accountsData.calendarAccounts);
+        setProviders(providersData.calendarProviders);
+>>>>>>> a9e2dd297 (feat(core): integrate google calendar sync (#14248))
       } catch (error) {
         if (
           signal?.aborted ||

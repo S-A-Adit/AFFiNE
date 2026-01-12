@@ -66,6 +66,9 @@ mod tests {
     let documents = html_loader.load().unwrap();
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> a9e2dd297 (feat(core): integrate google calendar sync (#14248))
     let expected = [
       "Example Domain",
       "",
@@ -75,12 +78,15 @@ mod tests {
       "      More information...",
     ]
     .join("\n");
+<<<<<<< HEAD
 =======
     let expected =
       "Example Domain\n\n        This domain is for use in illustrative examples in documents. You may\n        use \
        this domain in literature without prior coordination or asking for\n        permission.\n      More \
        information...";
 >>>>>>> 036153a0b (feat(native): sync yocto codes (#14243))
+=======
+>>>>>>> a9e2dd297 (feat(core): integrate google calendar sync (#14248))
 
     assert_eq!(documents.len(), 1);
     assert_eq!(
