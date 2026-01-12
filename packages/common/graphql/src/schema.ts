@@ -246,7 +246,6 @@ export interface BlobUploadedPart {
 
 export interface CalendarAccountObjectType {
   __typename?: 'CalendarAccountObjectType';
-  calendars: Array<CalendarSubscriptionObjectType>;
   calendarsCount: Scalars['Int']['output'];
   createdAt: Scalars['DateTime']['output'];
   displayName: Maybe<Scalars['String']['output']>;
@@ -938,6 +937,7 @@ export type ErrorDataUnion =
   | AlreadyInSpaceDataType
   | BlobNotFoundDataType
   | CalendarProviderRequestErrorDataType
+  | CalendarProviderRequestErrorDataType
   | CopilotContextFileNotSupportedDataType
   | CopilotDocNotFoundDataType
   | CopilotFailedToAddWorkspaceFileEmbeddingDataType
@@ -1005,6 +1005,7 @@ export enum ErrorNames {
   BLOB_INVALID = 'BLOB_INVALID',
   BLOB_NOT_FOUND = 'BLOB_NOT_FOUND',
   BLOB_QUOTA_EXCEEDED = 'BLOB_QUOTA_EXCEEDED',
+  CALENDAR_PROVIDER_REQUEST_ERROR = 'CALENDAR_PROVIDER_REQUEST_ERROR',
   CALENDAR_PROVIDER_REQUEST_ERROR = 'CALENDAR_PROVIDER_REQUEST_ERROR',
   CANNOT_DELETE_ACCOUNT_WITH_OWNED_TEAM_WORKSPACE = 'CANNOT_DELETE_ACCOUNT_WITH_OWNED_TEAM_WORKSPACE',
   CANNOT_DELETE_ALL_ADMIN_ACCOUNT = 'CANNOT_DELETE_ALL_ADMIN_ACCOUNT',
@@ -1468,6 +1469,11 @@ export interface LinkCalendarAccountInput {
   redirectUri?: InputMaybe<Scalars['String']['input']>;
 }
 
+export interface LinkCalendarAccountInput {
+  provider: CalendarProviderType;
+  redirectUri?: InputMaybe<Scalars['String']['input']>;
+}
+
 export interface ListUserInput {
   features?: InputMaybe<Array<FeatureType>>;
   first?: InputMaybe<Scalars['Int']['input']>;
@@ -1634,6 +1640,7 @@ export interface Mutation {
   inviteMembers: Array<InviteResult>;
   leaveWorkspace: Scalars['Boolean']['output'];
   linkCalendarAccount: Scalars['String']['output'];
+  linkCalendarAccount: Scalars['String']['output'];
   /** mention user in a doc */
   mentionUser: Scalars['ID']['output'];
   publishDoc: DocType;
@@ -1690,8 +1697,10 @@ export interface Mutation {
   /** Trigger generate missing titles cron job */
   triggerGenerateTitleCron: Scalars['Boolean']['output'];
   unlinkCalendarAccount: Scalars['Boolean']['output'];
+  unlinkCalendarAccount: Scalars['Boolean']['output'];
   /** update app configuration */
   updateAppConfig: Scalars['JSONObject']['output'];
+  updateCalendarAccount: Maybe<CalendarAccountObjectType>;
   updateCalendarAccount: Maybe<CalendarAccountObjectType>;
   /** Update a comment content */
   updateComment: Scalars['Boolean']['output'];
@@ -1713,6 +1722,7 @@ export interface Mutation {
   updateUserFeatures: Array<FeatureType>;
   /** Update workspace */
   updateWorkspace: WorkspaceType;
+  updateWorkspaceCalendars: WorkspaceCalendarObjectType;
   updateWorkspaceCalendars: WorkspaceCalendarObjectType;
   /** Update ignored docs */
   updateWorkspaceEmbeddingIgnoredDocs: Scalars['Int']['output'];
@@ -1972,6 +1982,10 @@ export interface MutationLinkCalendarAccountArgs {
   input: LinkCalendarAccountInput;
 }
 
+export interface MutationLinkCalendarAccountArgs {
+  input: LinkCalendarAccountInput;
+}
+
 export interface MutationMentionUserArgs {
   input: MentionInput;
 }
@@ -2129,8 +2143,17 @@ export interface MutationUnlinkCalendarAccountArgs {
   accountId: Scalars['String']['input'];
 }
 
+export interface MutationUnlinkCalendarAccountArgs {
+  accountId: Scalars['String']['input'];
+}
+
 export interface MutationUpdateAppConfigArgs {
   updates: Array<UpdateAppConfigInput>;
+}
+
+export interface MutationUpdateCalendarAccountArgs {
+  accountId: Scalars['String']['input'];
+  refreshIntervalMinutes: Scalars['Int']['input'];
 }
 
 export interface MutationUpdateCalendarAccountArgs {
@@ -2190,6 +2213,10 @@ export interface MutationUpdateUserFeaturesArgs {
 
 export interface MutationUpdateWorkspaceArgs {
   input: UpdateWorkspaceInput;
+}
+
+export interface MutationUpdateWorkspaceCalendarsArgs {
+  input: UpdateWorkspaceCalendarsInput;
 }
 
 export interface MutationUpdateWorkspaceCalendarsArgs {
@@ -2416,6 +2443,10 @@ export interface Query {
    * @deprecated use Mutation.applyDocUpdates
    */
   applyDocUpdates: Scalars['String']['output'];
+  calendarAccountCalendars: Array<CalendarSubscriptionObjectType>;
+  calendarAccounts: Array<CalendarAccountObjectType>;
+  calendarEvents: Array<CalendarEventObjectType>;
+  calendarProviders: Array<CalendarProviderType>;
   /** @deprecated use `user.quotaUsage` instead */
   collectAllBlobSizes: WorkspaceBlobSizes;
   /** Get current user */
@@ -2458,6 +2489,7 @@ export interface Query {
   validateAppConfig: Array<AppConfigValidateResult>;
   /** Get workspace by id */
   workspace: WorkspaceType;
+  workspaceCalendars: Array<WorkspaceCalendarObjectType>;
   /**
    * Get workspace role permissions
    * @deprecated use WorkspaceType[permissions] instead
@@ -2484,6 +2516,16 @@ export interface QueryApplyDocUpdatesArgs {
   op: Scalars['String']['input'];
   updates: Scalars['String']['input'];
   workspaceId: Scalars['String']['input'];
+}
+
+export interface QueryCalendarAccountCalendarsArgs {
+  accountId: Scalars['String']['input'];
+}
+
+export interface QueryCalendarEventsArgs {
+  from: Scalars['DateTime']['input'];
+  to: Scalars['DateTime']['input'];
+  workspaceCalendarId: Scalars['String']['input'];
 }
 
 export interface QueryErrorArgs {
@@ -2536,6 +2578,10 @@ export interface QueryValidateAppConfigArgs {
 
 export interface QueryWorkspaceArgs {
   id: Scalars['String']['input'];
+}
+
+export interface QueryWorkspaceCalendarsArgs {
+  workspaceId: Scalars['String']['input'];
 }
 
 export interface QueryWorkspaceRolePermissionsArgs {
@@ -2997,6 +3043,11 @@ export interface UpdateWorkspaceCalendarsInput {
   workspaceId: Scalars['String']['input'];
 }
 
+export interface UpdateWorkspaceCalendarsInput {
+  items: Array<WorkspaceCalendarItemInput>;
+  workspaceId: Scalars['String']['input'];
+}
+
 export interface UpdateWorkspaceInput {
   /** Enable AI */
   enableAi?: InputMaybe<Scalars['Boolean']['input']>;
@@ -3152,15 +3203,9 @@ export interface WorkspaceCalendarObjectType {
   createdByUserId: Scalars['String']['output'];
   displayNameOverride: Maybe<Scalars['String']['output']>;
   enabled: Scalars['Boolean']['output'];
-  events: Array<CalendarEventObjectType>;
   id: Scalars['String']['output'];
   items: Array<WorkspaceCalendarItemObjectType>;
   workspaceId: Scalars['String']['output'];
-}
-
-export interface WorkspaceCalendarObjectTypeEventsArgs {
-  from: Scalars['DateTime']['input'];
-  to: Scalars['DateTime']['input'];
 }
 
 export interface WorkspaceDocMeta {
@@ -3939,94 +3984,86 @@ export type GetBlobUploadPartUrlQueryVariables = Exact<{
   partNumber: Scalars['Int']['input'];
 }>;
 
-export type GetBlobUploadPartUrlQuery = {
-  __typename?: 'Query';
-  workspace: {
-    __typename?: 'WorkspaceType';
-    blobUploadPartUrl: {
-      __typename?: 'BlobUploadPart';
-      uploadUrl: string;
-      headers: any | null;
-      expiresAt: string | null;
-    };
+export type GetBlobUploadPartUrlMutation = {
+  __typename?: 'Mutation';
+  getBlobUploadPartUrl: {
+    __typename?: 'BlobUploadPart';
+    uploadUrl: string;
+    headers: any | null;
+    expiresAt: string | null;
   };
+};
+
+export type CalendarAccountCalendarsQueryVariables = Exact<{
+  accountId: Scalars['String']['input'];
+}>;
+
+export type CalendarAccountCalendarsQuery = {
+  __typename?: 'Query';
+  calendarAccountCalendars: Array<{
+    __typename?: 'CalendarSubscriptionObjectType';
+    id: string;
+    accountId: string;
+    provider: CalendarProviderType;
+    externalCalendarId: string;
+    displayName: string | null;
+    timezone: string | null;
+    color: string | null;
+    enabled: boolean;
+    lastSyncAt: string | null;
+  }>;
 };
 
 export type CalendarAccountsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type CalendarAccountsQuery = {
   __typename?: 'Query';
-  currentUser: {
-    __typename?: 'UserType';
-    calendarAccounts: Array<{
-      __typename?: 'CalendarAccountObjectType';
-      id: string;
-      provider: CalendarProviderType;
-      providerAccountId: string;
-      displayName: string | null;
-      email: string | null;
-      status: string;
-      lastError: string | null;
-      refreshIntervalMinutes: number;
-      calendarsCount: number;
-      createdAt: string;
-      updatedAt: string;
-      calendars: Array<{
-        __typename?: 'CalendarSubscriptionObjectType';
-        id: string;
-        accountId: string;
-        provider: CalendarProviderType;
-        externalCalendarId: string;
-        displayName: string | null;
-        timezone: string | null;
-        color: string | null;
-        enabled: boolean;
-        lastSyncAt: string | null;
-      }>;
-    }>;
-  } | null;
+  calendarAccounts: Array<{
+    __typename?: 'CalendarAccountObjectType';
+    id: string;
+    provider: CalendarProviderType;
+    providerAccountId: string;
+    displayName: string | null;
+    email: string | null;
+    status: string;
+    lastError: string | null;
+    refreshIntervalMinutes: number;
+    calendarsCount: number;
+    createdAt: string;
+    updatedAt: string;
+  }>;
 };
 
 export type CalendarEventsQueryVariables = Exact<{
-  workspaceId: Scalars['String']['input'];
+  workspaceCalendarId: Scalars['String']['input'];
   from: Scalars['DateTime']['input'];
   to: Scalars['DateTime']['input'];
 }>;
 
 export type CalendarEventsQuery = {
   __typename?: 'Query';
-  workspace: {
-    __typename?: 'WorkspaceType';
-    calendars: Array<{
-      __typename?: 'WorkspaceCalendarObjectType';
-      id: string;
-      events: Array<{
-        __typename?: 'CalendarEventObjectType';
-        id: string;
-        subscriptionId: string;
-        externalEventId: string;
-        recurrenceId: string | null;
-        status: string | null;
-        title: string | null;
-        description: string | null;
-        location: string | null;
-        startAtUtc: string;
-        endAtUtc: string;
-        originalTimezone: string | null;
-        allDay: boolean;
-      }>;
-    }>;
-  };
+  calendarEvents: Array<{
+    __typename?: 'CalendarEventObjectType';
+    id: string;
+    subscriptionId: string;
+    externalEventId: string;
+    recurrenceId: string | null;
+    status: string | null;
+    title: string | null;
+    description: string | null;
+    location: string | null;
+    startAtUtc: string;
+    endAtUtc: string;
+    originalTimezone: string | null;
+    allDay: boolean;
+  }>;
 };
 
 export type CalendarProvidersQueryVariables = Exact<{ [key: string]: never }>;
 
 export type CalendarProvidersQuery = {
   __typename?: 'Query';
-  serverConfig: {
-    __typename?: 'ServerConfigType';
-    calendarProviders: Array<CalendarProviderType>;
-  };
+  calendarProviders: Array<CalendarProviderType>;
 };
 
 export type LinkCalendarAccountMutationVariables = Exact<{
@@ -4101,26 +4138,23 @@ export type WorkspaceCalendarsQueryVariables = Exact<{
 
 export type WorkspaceCalendarsQuery = {
   __typename?: 'Query';
-  workspace: {
-    __typename?: 'WorkspaceType';
-    calendars: Array<{
-      __typename?: 'WorkspaceCalendarObjectType';
+  workspaceCalendars: Array<{
+    __typename?: 'WorkspaceCalendarObjectType';
+    id: string;
+    workspaceId: string;
+    createdByUserId: string;
+    displayNameOverride: string | null;
+    colorOverride: string | null;
+    enabled: boolean;
+    items: Array<{
+      __typename?: 'WorkspaceCalendarItemObjectType';
       id: string;
-      workspaceId: string;
-      createdByUserId: string;
-      displayNameOverride: string | null;
+      subscriptionId: string;
+      sortOrder: number | null;
       colorOverride: string | null;
       enabled: boolean;
-      items: Array<{
-        __typename?: 'WorkspaceCalendarItemObjectType';
-        id: string;
-        subscriptionId: string;
-        sortOrder: number | null;
-        colorOverride: string | null;
-        enabled: boolean;
-      }>;
     }>;
-  };
+  }>;
 };
 
 export type CancelSubscriptionMutationVariables = Exact<{
@@ -7270,9 +7304,9 @@ export type Queries =
       response: ListBlobsQuery;
     }
   | {
-      name: 'getBlobUploadPartUrlQuery';
-      variables: GetBlobUploadPartUrlQueryVariables;
-      response: GetBlobUploadPartUrlQuery;
+      name: 'calendarAccountCalendarsQuery';
+      variables: CalendarAccountCalendarsQueryVariables;
+      response: CalendarAccountCalendarsQuery;
     }
   | {
       name: 'calendarAccountsQuery';
@@ -7725,6 +7759,11 @@ export type Mutations =
       name: 'createBlobUploadMutation';
       variables: CreateBlobUploadMutationVariables;
       response: CreateBlobUploadMutation;
+    }
+  | {
+      name: 'getBlobUploadPartUrlMutation';
+      variables: GetBlobUploadPartUrlMutationVariables;
+      response: GetBlobUploadPartUrlMutation;
     }
   | {
       name: 'linkCalendarAccountMutation';

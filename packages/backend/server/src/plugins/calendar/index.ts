@@ -9,14 +9,7 @@ import { CalendarController } from './controller';
 import { CalendarCronJobs } from './cron';
 import { CalendarOAuthService } from './oauth';
 import { CalendarProviderFactory, CalendarProviders } from './providers';
-import {
-  CalendarAccountResolver,
-  CalendarMutationResolver,
-  CalendarServerConfigResolver,
-  UserCalendarResolver,
-  WorkspaceCalendarEventsResolver,
-  WorkspaceCalendarResolver,
-} from './resolver';
+import { CalendarResolver } from './resolver';
 import { CalendarService } from './service';
 
 @Module({
@@ -27,12 +20,7 @@ import { CalendarService } from './service';
     CalendarService,
     CalendarOAuthService,
     CalendarCronJobs,
-    CalendarServerConfigResolver,
-    UserCalendarResolver,
-    CalendarAccountResolver,
-    WorkspaceCalendarResolver,
-    WorkspaceCalendarEventsResolver,
-    CalendarMutationResolver,
+    CalendarResolver,
   ],
   controllers: [CalendarController],
 })
