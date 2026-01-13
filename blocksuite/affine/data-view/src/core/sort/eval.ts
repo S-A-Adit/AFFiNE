@@ -64,10 +64,6 @@ const compareString = (a: unknown, b: unknown): CompareType => {
     if (!aIsNaN && bIsNaN) {
       return -1; // Numeric part comes before non-numeric part
     }
-    if (!aIsNaN && !bIsNaN && numberA !== numberB) {
-      return numberA - numberB; // Numeric comparison for numeric parts
-    }
-
 const compareNumber = (a: unknown, b: unknown) => {
 =======
 const compareNumber = (a: unknown, b: unknown) => {
