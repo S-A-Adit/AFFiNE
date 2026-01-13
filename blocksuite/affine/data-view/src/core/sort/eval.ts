@@ -12,9 +12,28 @@ export const Compare = {
   LT: 'LT',
 } as const;
 export type CompareType = keyof typeof Compare | number;
+
+const compareList = <T>(
+  a: T[],
+  b: T[],
+  compare: (a: T, b: T) => CompareType
+): CompareType => {
+  const len = Math.min(a.length, b.length);
+  for (let i = 0; i < len; i++) {
+    const result = compare(a[i], b[i]);
+    if (typeof result === 'number' && result !== 0) {
+      return result;
+    }
+    if (result === Compare.GT || result === Compare.LT) {
+      return result;
+    }
+  }
+  return a.length - b.length;
+};
+
+const compareString = (a: unknown, b: unknown): CompareType => {
   const strA = String(a ?? '');
   const strB = String(b ?? '');
->>>>>>> d515d295ce736e7096d555a30e2b6bb40e19c100
 
   if (strA === '' && strB !== '') {
     return Compare.GT; // Empty strings come last
@@ -50,8 +69,6 @@ export type CompareType = keyof typeof Compare | number;
     return lowA.localeCompare(lowB); // Lexicographical comparison for string parts
   });
 };
-const compareNumber = (a: unknown, b: unknown) => {
-=======
   const strA = String(a ?? '');
   const strB = String(b ?? '');
 >>>>>>> d515d295c (feat(editor): enhance string comparison handling in eval.ts (#14233))
@@ -90,6 +107,8 @@ const compareNumber = (a: unknown, b: unknown) => {
     return lowA.localeCompare(lowB); // Lexicographical comparison for string parts
   });
 };
+const compareNumber = (a: unknown, b: unknown) => {
+=======
 const compareNumber = (a: unknown, b: unknown) => {
   if (a == null) {
     return Compare.GT;
