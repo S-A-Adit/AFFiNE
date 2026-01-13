@@ -26,7 +26,6 @@ const evalRef = (
     value: view.cellGetOrCreate(row.rowId, ref.name).jsonValue$.value,
     ttype,
   });
-};
   const strA = String(a ?? '');
   const strB = String(b ?? '');
 >>>>>>> d515d295ce736e7096d555a30e2b6bb40e19c100
