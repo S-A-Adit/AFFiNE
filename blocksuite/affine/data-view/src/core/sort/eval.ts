@@ -32,19 +32,6 @@ const compareList = <T>(
   listB: T[],
   compare: (a: T, b: T) => CompareType
 ) => {
-  let i = 0;
-  while (i < listA.length && i < listB.length) {
-    const a = listA[i];
-    const b = listB[i];
-    if (a == null || b == null) {
-      continue;
-    }
-    const result = compare(a, b);
-    if (result !== 0) {
-      return result;
-    }
-    i++;
-  }
   const strA = String(a ?? '');
   const strB = String(b ?? '');
 >>>>>>> d515d295ce736e7096d555a30e2b6bb40e19c100
@@ -83,6 +70,7 @@ const compareList = <T>(
     return lowA.localeCompare(lowB); // Lexicographical comparison for string parts
   });
 };
+const compareNumber = (a: unknown, b: unknown) => {
 =======
   const strA = String(a ?? '');
   const strB = String(b ?? '');
