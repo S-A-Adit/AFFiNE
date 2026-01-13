@@ -31,15 +31,13 @@ const compareList = <T>(
   }
   return a.length - b.length;
 };
-
-const compareString = (a: unknown, b: unknown): CompareType => {
-<<<<<<< HEAD
   const strA = String(a ?? '');
   const strB = String(b ?? '');
+>>>>>>> d515d295ce736e7096d555a30e2b6bb40e19c100
 =======
-  const strA = String(a || ''); // Ensure it's a string, treat null/undefined as empty string
-  const strB = String(b || ''); // Ensure it's a string, treat null/undefined as empty string
->>>>>>> e28e5aa38 (fix: Improve string comparison for numeric and empty values in sort)
+  const strA = String(a ?? '');
+  const strB = String(b ?? '');
+>>>>>>> d515d295ce736e7096d555a30e2b6bb40e19c100
 
   if (strA === '' && strB !== '') {
     return Compare.GT; // Empty strings come last
