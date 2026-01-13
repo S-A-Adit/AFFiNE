@@ -68,7 +68,6 @@ const compareString = (a: unknown, b: unknown): CompareType => {
       return numberA - numberB; // Numeric comparison for numeric parts
     }
 
-    return lowA.localeCompare(lowB); // Lexicographical comparison for string parts
 const compareNumber = (a: unknown, b: unknown) => {
 =======
 const compareNumber = (a: unknown, b: unknown) => {
