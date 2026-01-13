@@ -48,6 +48,41 @@ const compareList = <T>(
   const strA = String(a ?? '');
   const strB = String(b ?? '');
 >>>>>>> d515d295ce736e7096d555a30e2b6bb40e19c100
+
+  if (strA === '' && strB !== '') {
+    return Compare.GT; // Empty strings come last
+  }
+  if (strA !== '' && strB === '') {
+    return Compare.LT; // Empty strings come last
+  }
+  if (strA === '' && strB === '') {
+    return 0; // Both empty, equal
+  }
+
+  const listA = strA.split('.');
+  const listB = strB.split('.');
+  return compareList(listA, listB, (a, b) => {
+    const lowA = String(a).toLowerCase(); // Ensure 'a' and 'b' from split are strings too
+    const lowB = String(b).toLowerCase();
+
+    const numberA = Number.parseInt(lowA);
+    const numberB = Number.parseInt(lowB);
+    const aIsNaN = Number.isNaN(numberA);
+    const bIsNaN = Number.isNaN(numberB);
+
+    if (aIsNaN && !bIsNaN) {
+      return 1; // Non-numeric part comes after numeric part
+    }
+    if (!aIsNaN && bIsNaN) {
+      return -1; // Numeric part comes before non-numeric part
+    }
+    if (!aIsNaN && !bIsNaN && numberA !== numberB) {
+      return numberA - numberB; // Numeric comparison for numeric parts
+    }
+
+    return lowA.localeCompare(lowB); // Lexicographical comparison for string parts
+  });
+};
 =======
   const strA = String(a ?? '');
   const strB = String(b ?? '');
