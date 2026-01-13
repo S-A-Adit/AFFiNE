@@ -193,6 +193,7 @@ type BlobUploadedPart {
 }
 
 type CalendarAccountObjectType {
+  calendars: [CalendarSubscriptionObjectType!]!
   calendarsCount: Int!
   createdAt: DateTime!
   displayName: String
@@ -1779,11 +1780,7 @@ type Query {
   appConfig: JSONObject!
 
   """Apply updates to a doc using LLM and return the merged markdown."""
-  applyDocUpdates(docId: String!, op: String!, updates: String!, workspaceId: String!): String!
-  calendarAccountCalendars(accountId: String!): [CalendarSubscriptionObjectType!]!
-  calendarAccounts: [CalendarAccountObjectType!]!
-  calendarEvents(from: DateTime!, to: DateTime!, workspaceCalendarId: String!): [CalendarEventObjectType!]!
-  calendarProviders: [CalendarProviderType!]!
+  applyDocUpdates(docId: String!, op: String!, updates: String!, workspaceId: String!): String! @deprecated(reason: "use Mutation.applyDocUpdates")
   collectAllBlobSizes: WorkspaceBlobSizes! @deprecated(reason: "use `user.quotaUsage` instead")
 
   """Get current user"""
@@ -1833,7 +1830,6 @@ type Query {
 
   """Get workspace by id"""
   workspace(id: String!): WorkspaceType!
-  workspaceCalendars(workspaceId: String!): [WorkspaceCalendarObjectType!]!
 
   """Get workspace role permissions"""
   workspaceRolePermissions(id: String!): WorkspaceRolePermissions! @deprecated(reason: "use WorkspaceType[permissions] instead")
@@ -2448,6 +2444,7 @@ type WorkspaceCalendarObjectType {
   createdByUserId: String!
   displayNameOverride: String
   enabled: Boolean!
+  events(from: DateTime!, to: DateTime!): [CalendarEventObjectType!]!
   id: String!
   items: [WorkspaceCalendarItemObjectType!]!
   workspaceId: String!

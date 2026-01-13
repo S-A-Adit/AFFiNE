@@ -1,22 +1,13 @@
 import { Checkbox } from '@affine/component';
-<<<<<<< HEAD
 import type { CalendarAccountsQuery } from '@affine/graphql';
-=======
-import type { CalendarAccountCalendarsQuery } from '@affine/graphql';
->>>>>>> a9e2dd297 (feat(core): integrate google calendar sync (#14248))
 import { cssVarV2 } from '@toeverything/theme/v2';
 import { useCallback } from 'react';
 
 import * as styles from './subscription-setting.css';
 
-<<<<<<< HEAD
 type CalendarSubscription = NonNullable<
   NonNullable<CalendarAccountsQuery['currentUser']>['calendarAccounts'][number]
 >['calendars'][number];
-=======
-type CalendarSubscription =
-  CalendarAccountCalendarsQuery['calendarAccountCalendars'][number];
->>>>>>> a9e2dd297 (feat(core): integrate google calendar sync (#14248))
 
 export const SubscriptionSetting = ({
   subscription,

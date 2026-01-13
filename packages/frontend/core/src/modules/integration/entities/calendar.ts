@@ -1,8 +1,4 @@
 import type {
-<<<<<<< HEAD
-=======
-  CalendarAccountCalendarsQuery,
->>>>>>> a9e2dd297 (feat(core): integrate google calendar sync (#14248))
   CalendarAccountsQuery,
   CalendarEventsQuery,
   WorkspaceCalendarItemInput,
@@ -19,7 +15,6 @@ export class CalendarIntegration extends Entity {
     super();
   }
 
-<<<<<<< HEAD
   accounts$ = new LiveData<
     NonNullable<
       CalendarAccountsQuery['currentUser']
@@ -43,22 +38,6 @@ export class CalendarIntegration extends Entity {
       string,
       CalendarEventsQuery['workspace']['calendars'][number]['events'][number][]
     >
-=======
-  accounts$ = new LiveData<CalendarAccountsQuery['calendarAccounts'][number][]>(
-    []
-  );
-  accountCalendars$ = new LiveData<
-    Map<
-      string,
-      CalendarAccountCalendarsQuery['calendarAccountCalendars'][number][]
-    >
-  >(new Map());
-  workspaceCalendars$ = new LiveData<
-    WorkspaceCalendarsQuery['workspaceCalendars'][number][]
-  >([]);
-  readonly eventsByDateMap$ = new LiveData<
-    Map<string, CalendarEventsQuery['calendarEvents'][number][]>
->>>>>>> a9e2dd297 (feat(core): integrate google calendar sync (#14248))
   >(new Map());
   readonly eventDates$ = LiveData.computed(get => {
     const eventsByDateMap = get(this.eventsByDateMap$);
@@ -77,15 +56,11 @@ export class CalendarIntegration extends Entity {
     const subscriptionInfo = new Map<
       string,
       {
-<<<<<<< HEAD
         subscription: NonNullable<
           NonNullable<
             CalendarAccountsQuery['currentUser']
           >['calendarAccounts'][number]
         >['calendars'][number];
-=======
-        subscription: CalendarAccountCalendarsQuery['calendarAccountCalendars'][number];
->>>>>>> a9e2dd297 (feat(core): integrate google calendar sync (#14248))
         colorOverride?: string | null;
       }
     >();
@@ -150,7 +125,6 @@ export class CalendarIntegration extends Entity {
 
     const calendarsByAccount = new Map<
       string,
-<<<<<<< HEAD
       NonNullable<
         NonNullable<
           CalendarAccountsQuery['currentUser']
@@ -161,25 +135,6 @@ export class CalendarIntegration extends Entity {
     accounts.forEach(account => {
       calendarsByAccount.set(account.id, account.calendars ?? []);
     });
-=======
-      CalendarAccountCalendarsQuery['calendarAccountCalendars'][number][]
-    >();
-
-    await Promise.all(
-      accounts.map(async account => {
-        try {
-          const calendars = await this.store.fetchAccountCalendars(
-            account.id,
-            signal
-          );
-          calendarsByAccount.set(account.id, calendars);
-        } catch (error) {
-          console.error('Failed to load calendar subscriptions', error);
-          calendarsByAccount.set(account.id, []);
-        }
-      })
-    );
->>>>>>> a9e2dd297 (feat(core): integrate google calendar sync (#14248))
 
     this.accountCalendars$.setValue(calendarsByAccount);
     return calendarsByAccount;
