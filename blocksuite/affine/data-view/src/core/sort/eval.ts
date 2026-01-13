@@ -18,26 +18,7 @@ const compareList = <T>(
   a: T[],
   b: T[],
   compare: (a: T, b: T) => CompareType
-): CompareType => {
-  const len = Math.min(a.length, b.length);
-  for (let i = 0; i < len; i++) {
-    const result = compare(a[i], b[i]);
-    if (typeof result === 'number' && result !== 0) {
-      return result;
-    }
-    if (result === Compare.GT || result === Compare.LT) {
-      return result;
-    }
-  }
-<<<<<<< HEAD
-<<<<<<< HEAD
-  return a.length - b.length;
-};
-=======
-  return 0;
->>>>>>> 2981d488f (fix: Remove merge conflict markers in sort eval.ts)
-=======
->>>>>>> f709afb4c (fix: Resolve merge conflict in data-view sort eval.ts)
+) => {
   const strA = String(a ?? '');
   const strB = String(b ?? '');
 >>>>>>> d515d295ce736e7096d555a30e2b6bb40e19c100
@@ -76,6 +57,7 @@ const compareList = <T>(
     return lowA.localeCompare(lowB); // Lexicographical comparison for string parts
   });
 };
+const compareNumber = (a: unknown, b: unknown) => {
 =======
   const strA = String(a ?? '');
   const strB = String(b ?? '');
