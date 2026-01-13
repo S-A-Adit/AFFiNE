@@ -23,7 +23,13 @@ export function BlockNotionHtmlAdapterExtension(
 ): ExtensionType & {
   identifier: ServiceIdentifier<BlockNotionHtmlAdapterMatcher>;
 } {
-  const identifier = BlockNotionHtmlAdapterMatcherIdentifier(matcher.flavour);
+  // Ensure matcher.flavour is a string. If it's undefined, null, or not a non-empty string,
+  // fall back to a default value to prevent runtime errors when creating the identifier.
+  const flavour = typeof matcher.flavour === 'string' && matcher.flavour.length > 0
+    ? matcher.flavour
+    : 'notion-html-default-flavour'; // A descriptive default flavour
+
+  const identifier = BlockNotionHtmlAdapterMatcherIdentifier(flavour);
   return {
     setup: di => {
       di.addImpl(identifier, () => matcher);
