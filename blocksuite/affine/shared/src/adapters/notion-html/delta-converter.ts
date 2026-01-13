@@ -84,21 +84,24 @@ export class NotionHtmlDeltaConverter extends DeltaASTConverter<
     ast: HtmlAST,
     options: DeltaASTConverterOptions = Object.create(null)
   ): DeltaInsert<AffineTextAttributes>[] {
-    return this._spreadAstToDelta(ast, options).reduce((acc, cur) => {
-      if (acc.length === 0) {
-        return [cur];
-      }
-      const last = acc[acc.length - 1];
-      if (
-        typeof last.insert === 'string' &&
-        typeof cur.insert === 'string' &&
-        isEqual(last.attributes, cur.attributes)
-      ) {
-        last.insert += cur.insert;
-        return acc;
-      }
-      return [...acc, cur];
-    }, [] as DeltaInsert<AffineTextAttributes>[]);
+    return this._spreadAstToDelta(ast, options).reduce(
+      (acc, cur) => {
+        if (acc.length === 0) {
+          return [cur];
+        }
+        const last = acc[acc.length - 1];
+        if (
+          typeof last.insert === 'string' &&
+          typeof cur.insert === 'string' &&
+          isEqual(last.attributes, cur.attributes)
+        ) {
+          last.insert += cur.insert;
+          return acc;
+        }
+        return [...acc, cur];
+      },
+      [] as DeltaInsert<AffineTextAttributes>[]
+    );
   }
 
   deltaToAST(_: DeltaInsert<AffineTextAttributes>[]): InlineHtmlAST[] {
