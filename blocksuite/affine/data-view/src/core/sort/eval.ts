@@ -30,16 +30,17 @@ const compareList = <T>(
     }
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
   return a.length - b.length;
 };
 =======
   return 0;
 >>>>>>> 2981d488f (fix: Remove merge conflict markers in sort eval.ts)
+=======
+>>>>>>> f709afb4c (fix: Resolve merge conflict in data-view sort eval.ts)
   const strA = String(a ?? '');
   const strB = String(b ?? '');
 >>>>>>> d515d295ce736e7096d555a30e2b6bb40e19c100
-
-  if (strA === '' && strB !== '') {
 =======
   const strA = String(a ?? '');
   const strB = String(b ?? '');
