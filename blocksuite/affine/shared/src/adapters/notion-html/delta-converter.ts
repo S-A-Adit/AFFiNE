@@ -43,7 +43,7 @@ export class NotionHtmlDeltaConverter extends DeltaASTConverter<
   constructor(
     readonly configs: Map<string, string>,
     readonly inlineDeltaMatchers: InlineDeltaToNotionHtmlAdapterMatcher[],
-    readonly htmlASTToDeltaMatchers: NotionHtmlASTToDeltaMatcher[]
+    readonly htmlASTToDeltaMatchers: NotionHtmlASTToDeltaMatcher[],
   ) {
     super();
   }
