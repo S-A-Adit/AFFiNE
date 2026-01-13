@@ -27,11 +27,6 @@ const evalRef = (
     ttype,
   });
 };
-const compareList = <T>(
-  listA: T[],
-  listB: T[],
-  compare: (a: T, b: T) => CompareType
-) => {
   const strA = String(a ?? '');
   const strB = String(b ?? '');
 >>>>>>> d515d295ce736e7096d555a30e2b6bb40e19c100
