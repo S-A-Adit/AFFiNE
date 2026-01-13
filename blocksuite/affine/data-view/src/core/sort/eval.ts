@@ -13,12 +13,30 @@ export const Compare = {
   LT: 'LT',
 } as const;
 export type CompareType = keyof typeof Compare | number;
+<<<<<<< HEAD
 
 const compareList = <T>(
   a: T[],
   b: T[],
   compare: (a: T, b: T) => CompareType
 ) => {
+=======
+const evalRef = (
+  view: SingleView,
+  ref: VariableRef
+):
+  | ((row: Row) => {
+      value: unknown;
+      ttype?: TypeInstance;
+    })
+  | undefined => {
+  const ttype = view.propertyGetOrCreate(ref.name).dataType$.value;
+  return row => ({
+    value: view.cellGetOrCreate(row.rowId, ref.name).jsonValue$.value,
+    ttype,
+  });
+};
+>>>>>>> 451110c87 (fix: Resolve merge conflict in data view sorting logic)
   const strA = String(a ?? '');
   const strB = String(b ?? '');
 >>>>>>> d515d295ce736e7096d555a30e2b6bb40e19c100
@@ -83,11 +101,7 @@ const compareNumber = (a: unknown, b: unknown) => {
     const numberB = Number.parseInt(lowB);
     const aIsNaN = Number.isNaN(numberA);
     const bIsNaN = Number.isNaN(numberB);
-<<<<<<< HEAD
 
-const compareNumber = (a: unknown, b: unknown) => {
-=======
-=======
 
     if (aIsNaN && !bIsNaN) {
       return 1; // Non-numeric part comes after numeric part
@@ -102,7 +116,6 @@ const compareNumber = (a: unknown, b: unknown) => {
     return lowA.localeCompare(lowB); // Lexicographical comparison for string parts
   });
 };
->>>>>>> e28e5aa38 (fix: Improve string comparison for numeric and empty values in sort)
 const compareNumber = (a: unknown, b: unknown) => {
   if (a == null) {
     return Compare.GT;
