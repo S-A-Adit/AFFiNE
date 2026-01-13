@@ -12,20 +12,6 @@ export const Compare = {
   LT: 'LT',
 } as const;
 export type CompareType = keyof typeof Compare | number;
-const evalRef = (
-  view: SingleView,
-  ref: VariableRef
-):
-  | ((row: Row) => {
-      value: unknown;
-      ttype?: TypeInstance;
-    })
-  | undefined => {
-  const ttype = view.propertyGetOrCreate(ref.name).dataType$.value;
-  return row => ({
-    value: view.cellGetOrCreate(row.rowId, ref.name).jsonValue$.value,
-    ttype,
-  });
   const strA = String(a ?? '');
   const strB = String(b ?? '');
 >>>>>>> d515d295ce736e7096d555a30e2b6bb40e19c100
