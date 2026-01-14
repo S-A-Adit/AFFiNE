@@ -1,7 +1,7 @@
 import { shallowEqual } from '@affine/component';
 import { DebugLogger } from '@affine/debug';
 import { ServerDeploymentType } from '@affine/graphql';
-import { flushTelemetry, setTelemetryContext, tracker } from '@affine/track';
+import { tracker } from '@affine/track';
 import { LiveData, OnEvent, Service } from '@toeverything/infra';
 
 import type { AuthAccountInfo, Server, ServersService } from '../../cloud';
@@ -67,9 +67,11 @@ export class TelemetryService extends Service {
 
         if (prevAccount) {
           tracker.reset();
+          tracker.reset();
         }
         // the isSelfHosted property from environment is not reliable
         if (selfHosted !== prevSelfHosted) {
+          tracker.register({
           tracker.register({
             isSelfHosted: selfHosted,
           });
@@ -77,6 +79,8 @@ export class TelemetryService extends Service {
         prevSelfHosted = selfHosted;
         prevAccount = account ?? null;
         if (account) {
+          tracker.identify(account.id);
+          tracker.people.set({
           tracker.identify(account.id);
           tracker.people.set({
             $email: account.email,
@@ -104,6 +108,7 @@ export class TelemetryService extends Service {
 
   registerMiddlewares() {
     this.disposables.push(
+      tracker.middleware((_event, parameters) => {
       tracker.middleware((_event, parameters) => {
         const extraContext = this.extractGlobalContext();
         return {
