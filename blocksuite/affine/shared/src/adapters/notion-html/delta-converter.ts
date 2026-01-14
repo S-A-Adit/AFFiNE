@@ -43,7 +43,7 @@ export class NotionHtmlDeltaConverter extends DeltaASTConverter<
   constructor(
     readonly configs: Map<string, string>,
     readonly inlineDeltaMatchers: InlineDeltaToNotionHtmlAdapterMatcher[],
-    readonly htmlASTToDeltaMatchers: NotionHtmlASTToDeltaMatcher[],
+    readonly htmlASTToDeltaMatchers: NotionHtmlASTToDeltaMatcher[]
   ) {
     super();
   }
@@ -66,8 +66,8 @@ export class NotionHtmlDeltaConverter extends DeltaASTConverter<
 
     const result =
       'children' in ast
-        // Filter out null/undefined children from Notion HTML import
-        ? ast.children
+        ? // Filter out null/undefined children from Notion HTML import
+          ast.children
             .filter((child): child is HtmlAST => child != null)
             .flatMap(child => this._spreadAstToDelta(child, options))
         : [];
@@ -85,24 +85,21 @@ export class NotionHtmlDeltaConverter extends DeltaASTConverter<
     ast: HtmlAST,
     options: DeltaASTConverterOptions = Object.create(null)
   ): DeltaInsert<AffineTextAttributes>[] {
-    return this._spreadAstToDelta(ast, options).reduce(
-      (acc, cur) => {
-        if (acc.length === 0) {
-          return [cur];
-        }
-        const last = acc[acc.length - 1];
-        if (
-          typeof last.insert === 'string' &&
-          typeof cur.insert === 'string' &&
-          isEqual(last.attributes, cur.attributes)
-        ) {
-          last.insert += cur.insert;
-          return acc;
-        }
-        return [...acc, cur];
-      },
-      [] as DeltaInsert<AffineTextAttributes>[]
-    );
+    return this._spreadAstToDelta(ast, options).reduce((acc, cur) => {
+      if (acc.length === 0) {
+        return [cur];
+      }
+      const last = acc[acc.length - 1];
+      if (
+        typeof last.insert === 'string' &&
+        typeof cur.insert === 'string' &&
+        isEqual(last.attributes, cur.attributes)
+      ) {
+        last.insert += cur.insert;
+        return acc;
+      }
+      return [...acc, cur];
+    }, [] as DeltaInsert<AffineTextAttributes>[]);
   }
 
   deltaToAST(_: DeltaInsert<AffineTextAttributes>[]): InlineHtmlAST[] {
