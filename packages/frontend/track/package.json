@@ -3,13 +3,14 @@
   "type": "module",
   "private": true,
   "version": "0.26.0",
+  "version": "0.26.0",
   "exports": {
     ".": "./src/index.ts"
   },
   "dependencies": {
     "@affine/debug": "workspace:*",
     "@sentry/react": "^9.47.1",
-    "nanoid": "^5.1.6",
+    "mixpanel-browser": "^2.56.0",
     "react-router-dom": "^6.30.3"
   },
   "devDependencies": {
