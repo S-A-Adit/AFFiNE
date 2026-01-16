@@ -133,24 +133,14 @@ export class TelemetryService {
       };
     } catch (error) {
       const err = error as Error;
-      if (env.dev) {
-        this.logger.error('Telemetry forwarding failed', err);
-        return {
-          ok: false,
-          error: {
-            name: err?.name ?? 'TelemetryForwardingError',
-            message: err?.message ?? 'Telemetry forwarding failed',
-          },
-        };
-      } else {
-        return {
-          ok: false,
-          error: {
-            name: 'TelemetryForwardingError',
-            message: 'Telemetry forwarding failed',
-          },
-        };
-      }
+      this.logger.error('Telemetry forwarding failed', err);
+      return {
+        ok: false,
+        error: {
+          name: err?.name ?? 'TelemetryForwardingError',
+          message: err?.message ?? 'Telemetry forwarding failed',
+        },
+      };
     }
   }
 

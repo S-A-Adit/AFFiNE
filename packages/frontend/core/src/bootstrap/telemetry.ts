@@ -1,4 +1,4 @@
-import { ga4, sentry, tracker } from '@affine/track';
+import { sentry, tracker } from '@affine/track';
 import { APP_SETTINGS_STORAGE_KEY } from '@toeverything/infra/atom';
 
 tracker.init();
@@ -17,6 +17,6 @@ if (typeof localStorage !== 'undefined') {
   if (!enabled) {
     // NOTE: telemetry setting is respected by tracker and sentry.
     sentry.disable();
-    ga4.setEnabled(false);
+    tracker.opt_out_tracking();
   }
 }
