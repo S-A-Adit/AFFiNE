@@ -885,6 +885,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@affine/revert-update@workspace:tools/revert-update":
+  version: 0.0.0-use.local
+  resolution: "@affine/revert-update@workspace:tools/revert-update"
+  dependencies:
+    "@affine-tools/cli": "workspace:*"
+    "@types/node": "npm:^22.0.0"
+    typescript: "npm:^5.7.2"
+    yjs: "npm:^13.6.27"
+  languageName: unknown
+  linkType: soft
+
 "@affine/routes@workspace:*, @affine/routes@workspace:packages/frontend/routes":
   version: 0.0.0-use.local
   resolution: "@affine/routes@workspace:packages/frontend/routes"
