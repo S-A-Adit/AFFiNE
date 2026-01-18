@@ -93,6 +93,9 @@ af.cmd
 
 # playwright
 storageState.json
+.aider*
+config*
+postgres*
 # Docker runtime data
 postgres/
 storage/
