@@ -1,8 +1,8 @@
+import { SnapOverlay } from '@blocksuite/affine-gfx-pointer';
 import { type ServiceIdentifier } from '@blocksuite/global/di';
 import { DisposableGroup } from '@blocksuite/global/disposable';
 import { Bound, clamp, Point } from '@blocksuite/global/gfx';
 import { signal } from '@preact/signals-core';
-import { SnapOverlay } from '@blocksuite/affine-gfx-pointer';
 import last from 'lodash-es/last.js';
 
 import type { PointerEventState } from '../../event/state/pointer.js';
@@ -62,7 +62,7 @@ export class InteractivityManager extends GfxExtension {
   private readonly _disposable = new DisposableGroup();
 
   private canvasEventHandler = new GfxViewEventManager(this.gfx);
-  private snapOverlay: SnapOverlay;
+  private readonly snapOverlay: SnapOverlay;
 
   constructor(...args: ConstructorParameters<typeof GfxExtension>) {
     super(...args);
@@ -400,9 +400,13 @@ export class InteractivityManager extends GfxExtension {
       let dx = dragLastPos.x - internal.dragStartPos.x;
       let dy = dragLastPos.y - internal.dragStartPos.y;
 
-      
-      if (this.keyboard.shiftKey$.peek()) {
-          const snappedPoint = this.snapOverlay.snapDragAngle(internal.dragStartPos, dragLastPos, this.keyboard.shiftKey$.peek());
+      const isShiftPressed = this.keyboard.shiftKey$.peek();
+      if (isShiftPressed) {
+        const snappedPoint = this.snapOverlay.snapDragAngle(
+          internal.dragStartPos,
+          dragLastPos,
+          true
+        );
         dx = snappedPoint.x - internal.dragStartPos.x;
         dy = snappedPoint.y - internal.dragStartPos.y;
       }

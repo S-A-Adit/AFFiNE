@@ -1,6 +1,7 @@
 import { Point } from '@blocksuite/global/gfx';
-import { SnapOverlay } from '../snap-overlay';
 import { GfxController } from '@blocksuite/std/gfx';
+
+import { SnapOverlay } from '../snap-overlay';
 
 describe('SnapOverlay', () => {
   let snapOverlay: SnapOverlay;
@@ -46,16 +47,12 @@ describe('SnapOverlay', () => {
 
     it('should snap to 0 degrees (horizontal) when dragging right with shift', () => {
       const currentPoint = new Point(10, 2);
-      const initialDistance = Math.hypot(
-        currentPoint.x - startPoint.x,
-        currentPoint.y - startPoint.y
-      );
       const snappedPoint = snapOverlay.snapDragAngle(
         startPoint,
         currentPoint,
         true
       );
-      expect(snappedPoint.x).toBeCloseTo(initialDistance);
+      expect(snappedPoint.x).toBeCloseTo(10);
       expect(snappedPoint.y).toBeCloseTo(0);
     });
 
@@ -75,31 +72,23 @@ describe('SnapOverlay', () => {
 
     it('should snap to 90 degrees (vertical) when dragging down with shift', () => {
       const currentPoint = new Point(2, 10);
-      const initialDistance = Math.hypot(
-        currentPoint.x - startPoint.x,
-        currentPoint.y - startPoint.y
-      );
       const snappedPoint = snapOverlay.snapDragAngle(
         startPoint,
         currentPoint,
         true
       );
       expect(snappedPoint.x).toBeCloseTo(0);
-      expect(snappedPoint.y).toBeCloseTo(initialDistance);
+      expect(snappedPoint.y).toBeCloseTo(10);
     });
 
     it('should snap to 180 degrees (horizontal) when dragging left with shift', () => {
       const currentPoint = new Point(-10, 2);
-      const initialDistance = Math.hypot(
-        currentPoint.x - startPoint.x,
-        currentPoint.y - startPoint.y
-      );
       const snappedPoint = snapOverlay.snapDragAngle(
         startPoint,
         currentPoint,
         true
       );
-      expect(snappedPoint.x).toBeCloseTo(-initialDistance);
+      expect(snappedPoint.x).toBeCloseTo(-10);
       expect(snappedPoint.y).toBeCloseTo(0);
     });
 
